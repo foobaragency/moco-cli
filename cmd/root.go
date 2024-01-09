@@ -1,6 +1,5 @@
 /*
 Copyright © 2024 Patrick Maloney <patrick@foobar.agency>
-
 */
 package cmd
 
@@ -9,8 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -40,10 +37,11 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-    startCmd.SetUsageTemplate("Usage: moco start <project>\n\n")
     rootCmd.AddCommand(startCmd)
     rootCmd.AddCommand(loginCmd)
+    rootCmd.AddCommand(activitiesCmd)
     rootCmd.AddCommand(projectsCmd)
+    rootCmd.AddCommand(logoutCmd)
 }
 
 
