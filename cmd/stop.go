@@ -1,36 +1,25 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
-	"moco/config"
-	"net/http"
+	"moco/data"
 
 	"github.com/spf13/cobra"
 )
 
+// rootCmd represents the base command when called without any subcommands
 var stopCmd = &cobra.Command{
 	Use:   "stop [id]",
 	Short: "Stop time tracking for a given project",
-	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-        fmt.Println("args", args)
-		config := config.Init()
-		apiKey := config.GetString("api_key")
-
-        if apiKey == "" {
-            log.Fatal("api_key is required")
+        if activityId != 0 {
+            data.StopActivity(activityId)
         }
-
-        client := &http.Client{}
-
-        url := fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/projects/%s/start", args[0])
-        req, err := http.NewRequest("POST", url, nil)
-        resp, err := client.Do(req)
-        if err != nil {
-            log.Fatal(err)
-        }
-        fmt.Println(resp.StatusCode)
-
 	},
+}
+
+func init() {
+	stopCmd.Flags().IntVarP(&projectId, "project", "p", 0, "Project ID")
+	stopCmd.Flags().IntVarP(&taskId, "task", "t", 0, "Task ID")
+    stopCmd.Flags().IntVarP(&activityId, "activity", "a", 0, "Activity ID (if not provided, a new activity will be created)")
+	rootCmd.AddCommand(stopCmd)
 }

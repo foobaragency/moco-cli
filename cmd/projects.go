@@ -20,3 +20,7 @@ var projectsCmd = &cobra.Command{
         fmt.Println(strings.Join(projectNames, "\n"))
     },
 }
+
+func init() {
+    rootCmd.AddCommand(projectsCmd)
+}

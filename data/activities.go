@@ -1,12 +1,14 @@
 package data
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"moco/config"
 	"net/http"
+	"time"
 )
 
 type Activity struct {
@@ -16,17 +18,102 @@ type Activity struct {
 	Seconds        int     `json:"seconds"`
 	Description    string  `json:"description"`
 	TimerStartedAt string  `json:"timer_started_at"`
+	Project        struct {
+		Id   int    `json:"id"`
+		Name string `json:"name"`
+	}
+	Task struct {
+		Id   int    `json:"id"`
+		Name string `json:"name"`
+	}
+	User struct {
+		Id        int    `json:"id"`
+		FirstName string `json:"firstname"`
+		LastName  string `json:"lastname"`
+	}
 }
 
-func GetActivities() []Activity {
+func StartActivity(activityId int) error {
+	config := config.Init()
+	apiKey := config.GetString("api_key")
+	if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+	}
+
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities/%d/start_timer", activityId), nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode == 422 {
+        return fmt.Errorf("Error on response.\n[ERROR] - %s", err)
+	}
+	defer resp.Body.Close()
+    return nil
+}
+
+func StopActivity(activityId int) error {
+	config := config.Init()
+	apiKey := config.GetString("api_key")
+	if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+	}
+
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities/%d/stop_timer", activityId), nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode == 422 {
+        return fmt.Errorf("Error on response.\n[ERROR] - %s", err)
+	}
+	defer resp.Body.Close()
+    return nil
+}
+
+func CreateActivity(projectId int, taskId int, description string) error {
+	config := config.Init()
+	apiKey := config.GetString("api_key")
+	if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+	}
+	type ActivityBody struct {
+		ProjectId   int    `json:"project_id"`
+		TaskId      int    `json:"task_id"`
+		Description string `json:"description"`
+		Date        string `json:"date"`
+	}
+
+    body := ActivityBody{
+        ProjectId:   projectId,
+        TaskId:      taskId,
+        Description: description,
+        Date:        time.Now().Format("2006-01-02"),
+    }
+    marshaledBody, err := json.Marshal(body)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+	req, _ := http.NewRequest("POST", "https://foobaragency.mocoapp.com/api/v1/activities", bytes.NewReader(marshaledBody))
+	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+    req.Header.Add("Content-Type", "application/json")
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil || resp.StatusCode == 422 {
+        return err
+    }
+    defer resp.Body.Close()
+    return nil
+}
+
+func GetActivities() ([]Activity, error) {
 	config := config.Init()
 
 	apiKey := config.GetString("api_key")
 	if apiKey == "" {
-		log.Fatal("api_key not set")
+        return nil, fmt.Errorf("api_key not set")
 	}
 
-	req, _ := http.NewRequest("GET", "https://foobaragency.mocoapp.com/api/v1/activites", nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities?user_id=%d", GetUserId()), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -35,13 +122,13 @@ func GetActivities() []Activity {
 	}
 	defer resp.Body.Close()
 
-	var activites []Activity
+	var activities []Activity
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal("Error while reading the response bytes:", err)
+        return nil, err
 	}
-	json.Unmarshal(body, &activites)
+	json.Unmarshal(body, &activities)
 
-	return activites
+	return activities, nil
 }

@@ -20,6 +20,36 @@ type Project struct {
     Tasks []Task
 }
 
+func GetProject(projectId int) (Project, error) {
+    config := config.Init()
+    apiKey := config.GetString("api_key")
+    if apiKey == "" {
+        log.Fatal("api_key not set")
+    }
+    
+    req, _ := http.NewRequest("GET", "https://foobaragency.mocoapp.com/api/v1/projects/assigned", nil)
+    req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        return Project{}, err
+    }
+    defer resp.Body.Close()
+    
+    body, err := io.ReadAll(resp.Body)
+    if err != nil {
+        log.Println("Error while reading the response bytes:", err)
+    }
+
+    var project []Project
+    json.Unmarshal(body, &project)
+    for _, p := range project {
+        if p.Id == projectId {
+            return p, nil
+        }
+    }
+    return Project{}, fmt.Errorf("project not found")
+}
 
 func GetProjects() []Project {
     config := config.Init()

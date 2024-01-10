@@ -48,3 +48,7 @@ var loginCmd = &cobra.Command{
         config.WriteConfig()
 	},
 }
+
+func init() {
+    rootCmd.AddCommand(loginCmd)
+}

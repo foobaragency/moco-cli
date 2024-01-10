@@ -32,3 +32,7 @@ var logoutCmd = &cobra.Command{
 		os.Remove(home + "/.config/moco")
 	},
 }
+
+func init() {
+    rootCmd.AddCommand(logoutCmd)
+}
