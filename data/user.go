@@ -15,7 +15,7 @@ type User struct {
     LastName string `json:"lastname"`
 }
 
-func GetUserId() int {
+func GetUserId() (int, error) {
 	config := config.Init()
 
 	apiKey := config.GetString("api_key")
@@ -31,13 +31,13 @@ func GetUserId() int {
     client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
-        log.Fatal("Error on response.\n[ERROR] -", err)
+        return 0, fmt.Errorf("Could not find user")
     }
     defer resp.Body.Close()
 
     body, err := io.ReadAll(resp.Body)
     if err != nil {
-        log.Fatal("Error while reading the response bytes:", err)
+        return 0, fmt.Errorf("Could not find user")
     }
 
     var users []User
@@ -45,8 +45,8 @@ func GetUserId() int {
     json.Unmarshal(body, &users)
     for _, user := range users {
         if user.FirstName == firstName && user.LastName == lastName {
-            return user.Id
+            return user.Id, nil
         }
     }
-    return 0
+    return 0, fmt.Errorf("Could not find user")
 }

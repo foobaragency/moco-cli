@@ -45,8 +45,10 @@ func StartActivity(activityId int) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode == 422 {
-        return fmt.Errorf("Error on response.\n[ERROR] - %s", err)
-	}
+        return fmt.Errorf("Something went wrong")
+	} else if resp.StatusCode == 404 {
+        return fmt.Errorf("Activity not found")
+    }
 	defer resp.Body.Close()
     return nil
 }
@@ -113,7 +115,11 @@ func GetActivities() ([]Activity, error) {
         return nil, fmt.Errorf("api_key not set")
 	}
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities?user_id=%d", GetUserId()), nil)
+    userId, err := GetUserId()
+    if err != nil {
+        return nil, err
+    }
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities?user_id=%d", userId), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
 	client := &http.Client{}
 	resp, err := client.Do(req)

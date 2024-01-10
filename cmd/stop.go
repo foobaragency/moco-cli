@@ -18,8 +18,7 @@ var stopCmd = &cobra.Command{
 }
 
 func init() {
-	stopCmd.Flags().IntVarP(&projectId, "project", "p", 0, "Project ID")
-	stopCmd.Flags().IntVarP(&taskId, "task", "t", 0, "Task ID")
     stopCmd.Flags().IntVarP(&activityId, "activity", "a", 0, "Activity ID (if not provided, a new activity will be created)")
+    stopCmd.MarkFlagRequired("activity")
 	rootCmd.AddCommand(stopCmd)
 }

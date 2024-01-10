@@ -5,6 +5,7 @@ import (
 	"log"
 	"moco/data"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -14,22 +15,32 @@ var activitiesCmd = &cobra.Command{
 	Use:   "activities",
 	Short: "List available activities",
 	Run: func(cmd *cobra.Command, args []string) {
-        activites, err := data.GetActivities()
-        if err != nil {
-            log.Fatal(err)
-        }
-        var activityNames []string
-        for _, activity := range activites {
-            activityNames = append(activityNames, fmt.Sprintf("%d %s", activity.Id, activity.Description))
-        }
-        if len(activityNames) == 0 {
-            fmt.Println("No activities found")
-            return
-        }
-        fmt.Println(strings.Join(activityNames, "\n"))
+		activites, err := data.GetActivities()
+		if err != nil {
+			log.Fatal(err)
+		}
+		var activityNames []string
+		for _, activity := range activites {
+            elapsedString := ""
+			if activity.TimerStartedAt != "" {
+                startedAtTime, err := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
+                if (err != nil) {
+                    log.Fatal(err)
+                }
+                now := time.Now()
+                elapsed := now.Sub(startedAtTime).Round(time.Second)
+                elapsedString = fmt.Sprintf("(%s)", elapsed) 
+			}
+			activityNames = append(activityNames, fmt.Sprintf("%d %s %s", activity.Id, activity.Description, elapsedString))
+		}
+		if len(activityNames) == 0 {
+			fmt.Println("No activities found")
+			return
+		}
+		fmt.Println(strings.Join(activityNames, "\n"))
 	},
 }
 
 func init() {
-    rootCmd.AddCommand(activitiesCmd)
+	rootCmd.AddCommand(activitiesCmd)
 }

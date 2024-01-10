@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"moco/data"
 
 	"github.com/spf13/cobra"
@@ -18,7 +19,10 @@ var startCmd = &cobra.Command{
 	Long:  "Start time for an activity. You may either provide:\n1. An activity ID\n2. A project ID, task ID, and a description",
 	Run: func(cmd *cobra.Command, args []string) {
 		if activityId != 0 {
-			data.StartActivity(activityId)
+			err := data.StartActivity(activityId)
+            if err != nil {
+                fmt.Printf("Error starting activity: %v\n", err)
+            }
 		} else if projectId != 0 && taskId != 0 && description != "" {
 			data.CreateActivity(projectId, taskId, description)
 		} else {

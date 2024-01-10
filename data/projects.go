@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"moco/config"
 	"net/http"
 )
@@ -24,7 +23,7 @@ func GetProject(projectId int) (Project, error) {
     config := config.Init()
     apiKey := config.GetString("api_key")
     if apiKey == "" {
-        log.Fatal("api_key not set")
+        fmt.Errorf("api_key not set")
     }
     
     req, _ := http.NewRequest("GET", "https://foobaragency.mocoapp.com/api/v1/projects/assigned", nil)
@@ -38,7 +37,7 @@ func GetProject(projectId int) (Project, error) {
     
     body, err := io.ReadAll(resp.Body)
     if err != nil {
-        log.Println("Error while reading the response bytes:", err)
+        return Project{}, err
     }
 
     var project []Project
@@ -51,11 +50,11 @@ func GetProject(projectId int) (Project, error) {
     return Project{}, fmt.Errorf("project not found")
 }
 
-func GetProjects() []Project {
+func GetProjects() ([]Project, error) {
     config := config.Init()
     apiKey := config.GetString("api_key")
     if apiKey == "" {
-        log.Fatal("api_key not set")
+        return []Project{}, fmt.Errorf("api_key not set")
     }
     
     req, _ := http.NewRequest("GET", "https://foobaragency.mocoapp.com/api/v1/projects/assigned", nil)
@@ -63,16 +62,16 @@ func GetProjects() []Project {
     client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
-        log.Fatal("Error on response.\n[ERROR] -", err)
+        return []Project{}, err
     }
     defer resp.Body.Close()
     
     body, err := io.ReadAll(resp.Body)
     if err != nil {
-        log.Println("Error while reading the response bytes:", err)
+        return []Project{}, err
     }
 
     var projects []Project
     json.Unmarshal(body, &projects)
-    return projects
+    return projects, nil
 }
