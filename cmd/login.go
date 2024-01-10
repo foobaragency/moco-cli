@@ -26,11 +26,15 @@ var loginCmd = &cobra.Command{
 		config := config.Init()
 
 		apiKey := config.GetString("api_key")
-		if apiKey != "" {
+		if apiKey != "" && config.GetString("first_name") != "" && config.GetString("last_name") != "" && config.GetString("domain") != "" {
 			fmt.Println("Looks like you're already logged in.")
 			return
 		}
+
 		scanner := bufio.NewScanner(os.Stdin)
+        fmt.Print("Enter your Moco domain:")
+		scanner.Scan()
+        domain := scanner.Text()
 		fmt.Print("Enter your first name: ")
 		scanner.Scan()
 		firstName := scanner.Text()
@@ -44,6 +48,7 @@ var loginCmd = &cobra.Command{
 		config.Set("api_key", apiKey)
 		config.Set("first_name", firstName)
 		config.Set("last_name", lastName)
+        config.Set("domain", domain)
 
         config.WriteConfig()
 	},

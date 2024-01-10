@@ -22,11 +22,16 @@ type Project struct {
 func GetProject(projectId int) (Project, error) {
     config := config.Init()
     apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
     if apiKey == "" {
-        fmt.Errorf("api_key not set")
+        return Project{}, fmt.Errorf("api_key not set")
     }
+    if domain == "" {
+        return Project{}, fmt.Errorf("domain not set")
+    }
+
     
-    req, _ := http.NewRequest("GET", "https://foobaragency.mocoapp.com/api/v1/projects/assigned", nil)
+    req, _ := http.NewRequest("GET", fmt.Sprintf("https://%s.mocoapp.com/api/v1/projects/assigned", domain), nil)
     req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
     client := &http.Client{}
     resp, err := client.Do(req)
@@ -53,11 +58,15 @@ func GetProject(projectId int) (Project, error) {
 func GetProjects() ([]Project, error) {
     config := config.Init()
     apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
     if apiKey == "" {
         return []Project{}, fmt.Errorf("api_key not set")
     }
+    if domain == "" {
+        return []Project{}, fmt.Errorf("domain not set")
+    }
     
-    req, _ := http.NewRequest("GET", "https://foobaragency.mocoapp.com/api/v1/projects/assigned", nil)
+    req, _ := http.NewRequest("GET", fmt.Sprintf("https://%s.mocoapp.com/api/v1/projects/assigned", domain), nil)
     req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
     client := &http.Client{}
     resp, err := client.Do(req)

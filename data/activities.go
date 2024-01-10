@@ -39,8 +39,12 @@ func StartActivity(activityId int) error {
 	if apiKey == "" {
         return fmt.Errorf("api_key not set")
 	}
+	domain := config.GetString("domain")
+	if domain == "" {
+        return fmt.Errorf("domain not set")
+	}
 
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities/%d/start_timer", activityId), nil)
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d/start_timer", domain, activityId), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -59,8 +63,12 @@ func StopActivity(activityId int) error {
 	if apiKey == "" {
         return fmt.Errorf("api_key not set")
 	}
+	domain := config.GetString("domain")
+	if domain == "" {
+        return fmt.Errorf("domain not set")
+	}
 
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities/%d/stop_timer", activityId), nil)
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d/stop_timer",domain, activityId), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -74,9 +82,14 @@ func StopActivity(activityId int) error {
 func CreateActivity(projectId int, taskId int, description string) error {
 	config := config.Init()
 	apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
 	if apiKey == "" {
         return fmt.Errorf("api_key not set")
 	}
+    if domain == "" {
+        return fmt.Errorf("domain not set")
+    }
+
 	type ActivityBody struct {
 		ProjectId   int    `json:"project_id"`
 		TaskId      int    `json:"task_id"`
@@ -95,7 +108,7 @@ func CreateActivity(projectId int, taskId int, description string) error {
         log.Fatal(err)
     }
 
-	req, _ := http.NewRequest("POST", "https://foobaragency.mocoapp.com/api/v1/activities", bytes.NewReader(marshaledBody))
+	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities", domain), bytes.NewReader(marshaledBody))
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
     req.Header.Add("Content-Type", "application/json")
     client := &http.Client{}
@@ -111,15 +124,19 @@ func GetActivities() ([]Activity, error) {
 	config := config.Init()
 
 	apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
 	if apiKey == "" {
         return nil, fmt.Errorf("api_key not set")
 	}
+    if domain == "" {
+        return nil, fmt.Errorf("domain not set")
+    }
 
     userId, err := GetUserId()
     if err != nil {
         return nil, err
     }
-	req, _ := http.NewRequest("GET", fmt.Sprintf("https://foobaragency.mocoapp.com/api/v1/activities?user_id=%d", userId), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities?user_id=%d", domain, userId), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
 	client := &http.Client{}
 	resp, err := client.Do(req)
