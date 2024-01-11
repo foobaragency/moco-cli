@@ -120,6 +120,40 @@ func CreateActivity(projectId int, taskId int, description string) error {
     return nil
 }
 
+func EditActivity(id int, seconds int, description string) error {
+    config := config.Init()
+    apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
+    if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+    }
+    if domain == "" {
+        return fmt.Errorf("domain not set")
+    }
+
+    type Body struct {
+        Description string `json:"description,omitempty"`
+        Seconds     int    `json:"seconds,omitempty"`
+    }
+
+    body := Body{
+        Description: description,
+        Seconds:     seconds,
+    }
+    marshaledBody, err := json.Marshal(body)
+
+    req, _ := http.NewRequest("PUT", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d", domain, id), bytes.NewReader(marshaledBody))
+    req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+    req.Header.Add("Content-Type", "application/json")
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil || resp.StatusCode >= 400 && resp.StatusCode <= 499 {
+        return err
+    }
+    defer resp.Body.Close()
+    return nil
+}
+
 func DeleteActivity(id int) error {
     config := config.Init()
     apiKey := config.GetString("api_key")
