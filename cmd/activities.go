@@ -19,25 +19,25 @@ var activitiesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-        if id, _ := cmd.Flags().GetInt("delete"); id != 0 {
-            err := data.DeleteActivity(id)
-            if err != nil {
-                log.Fatal(err)
-            }
-            return
-        }
+		if id, _ := cmd.Flags().GetInt("delete"); id != 0 {
+			err := data.DeleteActivity(id)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
 
 		var activityNames []string
 		for _, activity := range activites {
-            elapsedString := ""
+			elapsedString := ""
 			if activity.TimerStartedAt != "" {
-                startedAtTime, err := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
-                if (err != nil) {
-                    log.Fatal(err)
-                }
-                now := time.Now()
-                elapsed := now.Sub(startedAtTime).Round(time.Second)
-                elapsedString = fmt.Sprintf("(%s)", elapsed) 
+				startedAtTime, err := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
+				if err != nil {
+					log.Fatal(err)
+				}
+				now := time.Now()
+				elapsed := now.Sub(startedAtTime).Round(time.Second)
+				elapsedString = fmt.Sprintf("(%s)", elapsed)
 			}
 			activityNames = append(activityNames, fmt.Sprintf("%d %s %s", activity.Id, activity.Description, elapsedString))
 		}
@@ -50,6 +50,6 @@ var activitiesCmd = &cobra.Command{
 }
 
 func init() {
-    activitiesCmd.Flags().IntP("delete", "d", 0, "Delete activity by ID")
+	activitiesCmd.Flags().IntP("delete", "d", 0, "Delete activity by ID")
 	rootCmd.AddCommand(activitiesCmd)
 }
