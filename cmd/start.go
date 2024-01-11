@@ -12,7 +12,6 @@ var projectId int
 var description string
 var taskId int
 
-// rootCmd represents the base command when called without any subcommands
 var startCmd = &cobra.Command{
 	Use:   "start [id]",
 	Short: "Start time tracking",

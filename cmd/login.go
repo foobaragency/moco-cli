@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	// "io"
-	// "log"
 	"moco/config"
 
 	"github.com/spf13/cobra"
@@ -18,7 +16,6 @@ type User struct {
 	Lastname  string `json:"lastname"`
 }
 
-// rootCmd represents the base command when called without any subcommands
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Log in to Moco",

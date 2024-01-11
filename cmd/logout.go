@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	// "io"
-	// "log"
-	"moco/config"
-
 	"github.com/spf13/cobra"
+
+	"moco/config"
 )
 
-// rootCmd represents the base command when called without any subcommands
 var logoutCmd = &cobra.Command{
 	Use:   "logout",
 	Short: "Log out from Moco",
