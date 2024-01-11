@@ -19,6 +19,14 @@ var activitiesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
+        if id, _ := cmd.Flags().GetInt("delete"); id != 0 {
+            err := data.DeleteActivity(id)
+            if err != nil {
+                log.Fatal(err)
+            }
+            return
+        }
+
 		var activityNames []string
 		for _, activity := range activites {
             elapsedString := ""
@@ -42,5 +50,6 @@ var activitiesCmd = &cobra.Command{
 }
 
 func init() {
+    activitiesCmd.Flags().IntP("delete", "d", 0, "Delete activity by ID")
 	rootCmd.AddCommand(activitiesCmd)
 }

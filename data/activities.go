@@ -120,6 +120,28 @@ func CreateActivity(projectId int, taskId int, description string) error {
     return nil
 }
 
+func DeleteActivity(id int) error {
+    config := config.Init()
+    apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
+    if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+    }
+    if domain == "" {
+        return fmt.Errorf("domain not set")
+    }
+
+    req, _ := http.NewRequest("DELETE", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d", domain, id), nil)
+    req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil || resp.StatusCode >= 400 && resp.StatusCode <= 499 {
+        return err
+    }
+    defer resp.Body.Close()
+    return nil
+}
+
 func GetActivities() ([]Activity, error) {
 	config := config.Init()
 
