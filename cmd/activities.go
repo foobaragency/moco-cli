@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"moco/data"
+	"moco/ui"
 	"strings"
 	"time"
 
@@ -14,6 +15,38 @@ var activitiesCmd = &cobra.Command{
 	Use:   "activities",
 	Short: "List available activities",
 	Run: func(cmd *cobra.Command, args []string) {
+        if n, _ := cmd.Flags().GetBool("new"); n {
+            projects, err := data.GetProjects()
+            if err != nil {
+                log.Fatal(err)
+            }
+            pickableProjects := make([]data.Pickable, len(projects))
+            for i, project := range projects {
+                pickableProjects[i] = project
+            }
+            selectedProject, err := ui.Pick(pickableProjects, "Select project")
+            if err != nil {
+                fmt.Println("Could not pick project")
+                return
+            }
+            tasks := selectedProject.(data.Project).Tasks
+            pickableTasks := make([]data.Pickable, len(tasks))
+            for i, task := range tasks {
+                pickableTasks[i] = task
+            }
+            selectedTask, err := ui.Pick(pickableTasks, "Select task")
+            if err != nil {
+                fmt.Println("Could not pick task")
+                return
+            }
+
+            // fmt.Printf("Selected project: %s\n", selectedProject.(data.Project).Name)
+            // fmt.Printf("Selected task: %s\n", selectedTask.(data.Task).Name)
+            description, err := ui.Prompt("Enter activity description")
+            err = data.CreateActivity(selectedProject.(data.Project).Id, selectedTask.(data.Task).Id, description)
+            return
+        }
+
 		activites, err := data.GetActivities()
 		if err != nil {
 			log.Fatal(err)
@@ -39,22 +72,17 @@ var activitiesCmd = &cobra.Command{
                 fmt.Println("Could not edit activity:", err)
             }
             return
-            
         }
+
 
 		var activityNames []string
 		for _, activity := range activites {
-			elapsedString := ""
-			if activity.TimerStartedAt != "" {
-				startedAtTime, err := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
-				if err != nil {
-					log.Fatal(err)
-				}
-				now := time.Now()
-				elapsed := now.Sub(startedAtTime).Round(time.Second)
-				elapsedString = fmt.Sprintf("(%s)", elapsed)
-			}
-			activityNames = append(activityNames, fmt.Sprintf("%d %s %s", activity.Id, activity.Description, elapsedString))
+            runningIndicator := " "
+            if activity.TimerStartedAt != "" {
+                runningIndicator = "*"
+            }
+            duration := time.Duration(activity.Seconds * 1000000000)
+            activityNames = append(activityNames, fmt.Sprintf("%s%d\t%s\t%s", runningIndicator, activity.Id, duration.String(), activity.Description))
 		}
 		if len(activityNames) == 0 {
 			fmt.Println("No activities found")
@@ -65,10 +93,12 @@ var activitiesCmd = &cobra.Command{
 }
 
 func init() {
+    activitiesCmd.Flags().BoolP("new", "n", false, "Create a new activity")
+
 	activitiesCmd.Flags().IntP("delete", "x", 0, "Delete activity by ID")
     activitiesCmd.Flags().IntP("edit", "e", 0, "Edit activity by ID")
     activitiesCmd.Flags().IntP("time", "t", 0, "Set the time for the activity (in seconds)")
-    activitiesCmd.Flags().StringP("description", "d", "", "Set the time for the activity")
+    activitiesCmd.Flags().StringP("description", "d", "", "Set the description for the activity")
 
 	rootCmd.AddCommand(activitiesCmd)
 }

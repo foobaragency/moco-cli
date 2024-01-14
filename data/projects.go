@@ -19,6 +19,20 @@ type Project struct {
     Tasks []Task
 }
 
+type Pickable interface {
+    GetName() string
+    GetId() int
+    FilterValue() string
+}
+
+func (p Project) FilterValue() string { return p.Name }
+func (p Project) GetName() string    { return p.Name }
+func (p Project) GetId() int      { return p.Id }
+
+func (t Task) FilterValue() string { return t.Name }
+func (t Task) GetName() string    { return t.Name }
+func (t Task) GetId() int      { return t.Id }
+
 func GetProject(projectId int) (Project, error) {
     config := config.Init()
     apiKey := config.GetString("api_key")
