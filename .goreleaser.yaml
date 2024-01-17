@@ -17,8 +17,9 @@ universal_binaries:
 
 brews:
   -
-    name: moco
+    name: moco-cli
     homepage: "https://github.com/foobaragency/moco-cli"
+    download_strategy: GitHubPrivateRepositoryReleaseDownloadStrategy
     repository:
       owner: foobaragency  
       name: homebrew-foobaragency
