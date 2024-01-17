@@ -86,6 +86,12 @@ var activitiesCmd = &cobra.Command{
 		for _, activity := range activites {
 			runningIndicator := " "
             duration := time.Duration(activity.Seconds * 1000000000)
+
+            // if the today flag is set and this activity is not from today, continue
+            if today, _ := cmd.Flags().GetBool("today"); today && activity.Date != time.Now().Format("2006-01-02") {
+                continue
+            }
+
 			if activity.TimerStartedAt != "" {
 				runningIndicator = "*"
                 started, err := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
@@ -112,6 +118,7 @@ func init() {
 	activitiesCmd.Flags().IntP("edit", "e", 0, "Edit activity by ID")
 	activitiesCmd.Flags().IntP("time", "t", 0, "Set the time for the activity (in seconds)")
 	activitiesCmd.Flags().StringP("description", "d", "", "Set the description for the activity")
+    activitiesCmd.Flags().Bool("today", false, "List activities for today")
 
 	rootCmd.AddCommand(activitiesCmd)
 }

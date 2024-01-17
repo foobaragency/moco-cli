@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"moco/data"
 
 	"github.com/spf13/cobra"
@@ -13,6 +14,16 @@ var stopCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
         if activityId != 0 {
             data.StopActivity(activityId)
+        }
+        activities, err := data.GetActivities()
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+        for _, activity := range activities {
+            if activity.TimerStartedAt != "" {
+                data.StopActivity(activity.Id)
+            }
         }
 	},
 }
