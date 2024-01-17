@@ -21,7 +21,7 @@ brews:
   -
     name: moco
     homepage: "https://github.com/foobaragency/moco-cli"
-    tap:
+    repository:
       owner: foobaragency  
       name: homebrew-foobaragency
 
