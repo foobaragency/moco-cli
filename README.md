@@ -25,12 +25,11 @@ Once you have that key, simply execute `moco login`, enter your first name, last
 
 Moco CLI comes with a few basic commands built in.
 
-| Command      | Description                                            |
-| ------------ | ------------------------------------------------------ |
-| `ls`         | List existing moco items (projects, tasks, activities) |
-| `activities` | Actions for activities (new, edit, etc.)               |
-| `help`       | Help about any command                                 |
-| `login`      | Log in to Moco                                         |
-| `logout`     | Log out from Moco                                      |
-| `start`      | Start time tracking                                    |
-| `stop`       | Stop time tracking for a given project                 |
+| Command    | Description                                            |
+| ---------- | ------------------------------------------------------ |
+| `ls`       | List existing moco items (projects, tasks, activities) |
+| `activity` | Actions for activities (new, edit, delete, etc.)       |
+| `help`     | Help about any command                                 |
+| `login`    | Log in to Moco                                         |
+| `logout`   | Log out from Moco                                      |
+| `stop`     | Stop time tracking for a given project                 |
