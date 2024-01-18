@@ -16,7 +16,6 @@ var projectCmd = &cobra.Command{
     Short: "List projects",
     Run: func(cmd *cobra.Command, args []string) {
         projects, _ := data.GetProjects()
-        fmt.Println("Projects:")
         for _, project := range projects {
             fmt.Printf("%d %s\n", project.Id, project.Name)
         }
@@ -35,7 +34,6 @@ var taskCmd = &cobra.Command{
                 fmt.Println(err)
                 return
             }
-            fmt.Println("Tasks:")
             for _, task := range project.Tasks {
                 fmt.Printf("%d %s\n", task.Id, task.Name)
             }
@@ -43,7 +41,6 @@ var taskCmd = &cobra.Command{
         }
 
         projects, _ := data.GetProjects()
-        fmt.Println("Tasks:")
         for _, project := range projects {
             tasks := project.Tasks
             for _, task := range tasks {
@@ -59,7 +56,6 @@ var activityCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         activities, _ := data.GetActivities()
         today, _ := cmd.Flags().GetBool("today")
-        fmt.Println("Activities:")
         for _, activity := range activities {
             if !today || activity.Date == time.Now().Format("2006-01-02") {
                 fmt.Printf("%d %s\n", activity.Id, activity.Description)
@@ -71,41 +67,6 @@ var activityCmd = &cobra.Command{
 var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "List existing moco items (projects, tasks, activities)",
-	Run: func(cmd *cobra.Command, args []string) {
-        projects, _ := cmd.Flags().GetBool("projects")
-        tasks, _ := cmd.Flags().GetBool("tasks")
-        activities, _ := cmd.Flags().GetBool("activities")
-        if (projects) {
-            projects, err := data.GetProjects()
-            if err != nil {
-                fmt.Println(err)
-            }
-            fmt.Println("Projects:")
-            for _, project := range projects {
-                fmt.Printf("%d. %s\n", project.Id, project.Name)
-            }
-        } else if (tasks) {
-            projects, err := data.GetProjects()
-            if err != nil {
-                fmt.Println(err)
-            }
-            fmt.Println("Tasks:")
-            for _, project := range projects {
-                tasks := project.Tasks
-                for _, task := range tasks {
-                    fmt.Printf("%d. %s\n", task.Id, task.Name)
-                }
-            }
-        } else if (activities) {
-            activities, err := data.GetActivities()
-            if err != nil {
-                fmt.Println(err)
-            }
-            for _, activity := range activities {
-                fmt.Printf("%d. %s\n", activity.Id, activity.Description)
-            }
-        }
-	},
 }
 
 func init() {
