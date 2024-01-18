@@ -114,7 +114,7 @@ var deleteCmd = &cobra.Command{
 }
 
 var activitiesCmd = &cobra.Command{
-	Use:   "activities",
+	Use:   "activity",
 	Short: "Create, edit, or delete activities",
 }
 

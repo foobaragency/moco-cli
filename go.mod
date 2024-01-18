@@ -2,10 +2,7 @@ module moco
 
 go 1.21
 
-require (
-	github.com/charmbracelet/lipgloss v0.9.1
-	github.com/spf13/viper v1.18.2
-)
+require github.com/spf13/viper v1.18.2
 
 require (
 	github.com/alecthomas/chroma v0.10.0 // indirect
@@ -14,6 +11,7 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/charmbracelet/glamour v0.6.0 // indirect
+	github.com/charmbracelet/lipgloss v0.9.1 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
@@ -29,7 +27,6 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f // indirect
 	github.com/yuin/goldmark v1.6.0 // indirect
 	github.com/yuin/goldmark-emoji v1.0.2 // indirect
 	golang.org/x/net v0.19.0 // indirect
@@ -38,8 +35,8 @@ require (
 )
 
 require (
-	github.com/charmbracelet/bubbles v0.17.1
-	github.com/charmbracelet/bubbletea v0.25.0
+	github.com/charmbracelet/bubbles v0.17.1 // indirect
+	github.com/charmbracelet/bubbletea v0.25.0 // indirect
 	github.com/charmbracelet/huh v0.2.3
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
