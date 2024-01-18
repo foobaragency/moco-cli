@@ -1,3 +1,4 @@
+project_name: moco
 builds:
   - binary: moco
     goos:
