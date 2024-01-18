@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 
+	"github.com/charmbracelet/huh"
 	"moco/config"
 
 	"github.com/spf13/cobra"
@@ -27,30 +26,30 @@ var loginCmd = &cobra.Command{
 			fmt.Println("Looks like you're already logged in.")
 			return
 		}
+		var domain string
+		var firstName string
+		var lastName string
 
-		scanner := bufio.NewScanner(os.Stdin)
-        fmt.Print("Enter your Moco domain:")
-		scanner.Scan()
-        domain := scanner.Text()
-		fmt.Print("Enter your first name: ")
-		scanner.Scan()
-		firstName := scanner.Text()
-		fmt.Print("Enter your last name: ")
-		scanner.Scan()
-		lastName := scanner.Text()
-		fmt.Print("Your API key: ")
-		scanner.Scan()
-		apiKey = scanner.Text()
+		form := huh.NewForm(
+            huh.NewGroup(
+                huh.NewInput().Title("Domain").Prompt("?").Value(&domain),
+                huh.NewInput().Title("First Name").Prompt("?").Value(&firstName),
+                huh.NewInput().Title("Last Name").Prompt("?").Value(&lastName),
+                huh.NewInput().Title("API Key").Prompt("?").Value(&apiKey).Password(true),
+            ),
+        )
+
+        form.Run()
 
 		config.Set("api_key", apiKey)
 		config.Set("first_name", firstName)
 		config.Set("last_name", lastName)
-        config.Set("domain", domain)
+		config.Set("domain", domain)
 
-        config.WriteConfig()
+		config.WriteConfig()
 	},
 }
 
 func init() {
-    rootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(loginCmd)
 }
