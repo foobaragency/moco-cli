@@ -28,8 +28,8 @@ Moco CLI comes with a few basic commands built in.
 | Command    | Description                                            |
 | ---------- | ------------------------------------------------------ |
 | ls         | List existing moco items (projects, tasks, activities) |
+| activities | Actions for activities (new, edit, etc.)               |
 | help       | Help about any command                                 |
-| activities | List available activities                              |
 | login      | Log in to Moco                                         |
 | logout     | Log out from Moco                                      |
 | start      | Start time tracking                                    |
