@@ -58,7 +58,15 @@ var activityCmd = &cobra.Command{
         today, _ := cmd.Flags().GetBool("today")
         for _, activity := range activities {
             if !today || activity.Date == time.Now().Format("2006-01-02") {
-                fmt.Printf("%d\t%s\n", activity.Id, activity.Description)
+                prefix := " "
+                duration := time.Duration(activity.Seconds * 1000000000)
+                if activity.TimerStartedAt != "" {
+                    prefix = "*"
+                    started, _ := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
+                    elapsed := time.Since(started).Round(time.Second)
+                    duration += elapsed
+                }
+                fmt.Printf("%s%d\t%s\t(%s)\n", prefix, activity.Id, activity.Description, duration.String())
             }
         }
     },
