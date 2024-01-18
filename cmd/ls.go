@@ -58,7 +58,7 @@ var activityCmd = &cobra.Command{
         today, _ := cmd.Flags().GetBool("today")
         for _, activity := range activities {
             if !today || activity.Date == time.Now().Format("2006-01-02") {
-                fmt.Printf("%d %s\n", activity.Id, activity.Description)
+                fmt.Printf("%d\t%s\n", activity.Id, activity.Description)
             }
         }
     },
