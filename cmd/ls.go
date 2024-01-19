@@ -107,10 +107,6 @@ var lsCmd = &cobra.Command{
 }
 
 func init() {
-    lsCmd.Flags().BoolP("projects", "p", false, "List projects")
-    lsCmd.Flags().BoolP("tasks", "t", false, "List tasks")
-    lsCmd.Flags().BoolP("activities", "a", false, "List activities")
-
     lsCmd.AddCommand(projectCmd)
 
     taskCmd.Flags().IntP("project", "p", 0, "Project ID")
