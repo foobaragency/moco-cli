@@ -64,23 +64,39 @@ var activityCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         activities, _ := data.GetActivities()
         today, _ := cmd.Flags().GetBool("today")
-        t := table.New().
-            Border(lipgloss.NormalBorder()).
-            Headers("ID", "Date", "Time", "Description")
 
+        rows := make([][]string, 0)
+        runningIndex := 0
         for _, activity := range activities {
             if !today || activity.Date == time.Now().Format("2006-01-02") {
-                prefix := " "
                 duration := time.Duration(activity.Seconds * 1000000000)
                 if activity.TimerStartedAt != "" {
-                    prefix = "*"
                     started, _ := time.Parse("2006-01-02T15:04:05Z", activity.TimerStartedAt)
                     elapsed := time.Since(started).Round(time.Second)
                     duration += elapsed
+                    runningIndex = len(rows) + 1
                 }
-                t.Row(fmt.Sprintf("%d", activity.Id), activity.Date, fmt.Sprintf("%s%s", prefix, duration.String()), activity.Description)
+                id := fmt.Sprintf("%d", activity.Id)
+                date := activity.Date
+                time := duration.String()
+                desc := activity.Description
+                rows = append(rows, []string{id, date, time, desc})
             }
         }
+        t := table.New().
+            Border(lipgloss.NormalBorder()).
+            Headers("ID", "Date", "Time", "Description").
+            StyleFunc(func(row int, col int) lipgloss.Style {
+                if (runningIndex < 1) {
+                    return lipgloss.Style{}
+                }
+
+                if runningIndex == row {
+                    return lipgloss.NewStyle().Foreground(lipgloss.Color("9")).Bold(true)
+                }
+                return lipgloss.Style{}
+            }).
+            Rows(rows...)
         fmt.Println(t)
     },
 }
