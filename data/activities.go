@@ -80,7 +80,6 @@ func CreateActivity(projectId int, taskId int, description string, minutes int) 
         Date:        time.Now().Format("2006-01-02"),
         Seconds:     minutes * 60,
     })
-    fmt.Println(string(marshaledBody))
 
     req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities", domain), bytes.NewReader(marshaledBody))
     req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
