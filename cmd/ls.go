@@ -15,6 +15,12 @@ var projectCmd = &cobra.Command{
     Short: "List projects",
     Run: func(cmd *cobra.Command, args []string) {
         projects, _ := data.GetProjects()
+        if lines, err := cmd.Flags().GetBool("lines"); err == nil && lines {
+            for _, project := range projects {
+                fmt.Printf("%d %s\n", project.Id, project.GetName())
+            }
+            return
+        }
         t := table.New().
             Border(lipgloss.RoundedBorder()).
             Headers("ID", "Name").
@@ -53,7 +59,16 @@ var taskCmd = &cobra.Command{
             return
         }
 
+
         projects, _ := data.GetProjects()
+        if lines, err := cmd.Flags().GetBool("lines"); err == nil && lines {
+            for _, project := range projects {
+                for _, task := range project.Tasks {
+                    fmt.Printf("%d\t%s\n", task.Id, task.Name)
+                }
+            }
+            return
+        }
         for _, project := range projects {
             tasks := project.Tasks
             for _, task := range tasks {
@@ -97,6 +112,18 @@ var activityCmd = &cobra.Command{
                 rows = append(rows, []string{id, date, time, desc})
             }
         }
+        if lines, err := cmd.Flags().GetBool("lines"); err == nil && lines {
+            for i := 0; i < len(rows); i++ {
+                for j := 0; j < len(rows[i]); j++ {
+                    fmt.Print(rows[i][j])
+                    if j < len(rows[i])-1 {
+                        fmt.Print("\t")
+                    }
+                }
+                fmt.Println()
+            }
+            return
+        }
         t := table.New().
             Border(lipgloss.RoundedBorder()).
             Headers("ID", "Date", "Time", "Description").
@@ -122,13 +149,17 @@ var lsCmd = &cobra.Command{
 }
 
 func init() {
+    projectCmd.Flags().BoolP("lines", "l", false, "List in lines")
     lsCmd.AddCommand(projectCmd)
 
     taskCmd.Flags().IntP("project", "p", 0, "Project ID")
+    taskCmd.Flags().BoolP("lines", "l", false, "List in lines")
     lsCmd.AddCommand(taskCmd)
 
     activityCmd.Flags().BoolP("today", "t", false, "List tasks for today")
+    activityCmd.Flags().BoolP("lines", "l", false, "List in lines")
     lsCmd.AddCommand(activityCmd)
+
 
 	rootCmd.AddCommand(lsCmd)
 }
