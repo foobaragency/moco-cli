@@ -64,6 +64,14 @@ var taskCmd = &cobra.Command{
     },
 }
 
+func fmtDuration(d time.Duration) string {
+    d = d.Round(time.Minute)
+    h := d / time.Hour
+    d -= h * time.Hour
+    m := d / time.Minute
+    return fmt.Sprintf("%02d:%02d", h, m)
+}
+
 var activityCmd = &cobra.Command{
     Use:   "activity",
     Short: "List activities",
@@ -84,7 +92,7 @@ var activityCmd = &cobra.Command{
                 }
                 id := fmt.Sprintf("%d", activity.Id)
                 date := activity.Date
-                time := duration.String()
+                time := fmtDuration(duration)
                 desc := activity.Description
                 rows = append(rows, []string{id, date, time, desc})
             }
