@@ -33,30 +33,6 @@ type Activity struct {
 	}
 }
 
-func StartActivity(activityId int) error {
-	config := config.Init()
-	apiKey := config.GetString("api_key")
-	if apiKey == "" {
-		return fmt.Errorf("api_key not set")
-	}
-	domain := config.GetString("domain")
-	if domain == "" {
-		return fmt.Errorf("domain not set")
-	}
-
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d/start_timer", domain, activityId), nil)
-	req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil || resp.StatusCode == 422 {
-		return fmt.Errorf("Something went wrong")
-	} else if resp.StatusCode == 404 {
-		return fmt.Errorf("Activity not found")
-	}
-	defer resp.Body.Close()
-	return nil
-}
-
 func StopActivity(activityId int) error {
 	config := config.Init()
 	apiKey := config.GetString("api_key")
@@ -79,7 +55,46 @@ func StopActivity(activityId int) error {
 	return nil
 }
 
-func CreateActivity(projectId int, taskId int, description string) error {
+func CreateActivity(projectId int, taskId int, description string, minutes int) error {
+    config := config.Init()
+    apiKey := config.GetString("api_key")
+    if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+    }
+    domain := config.GetString("domain")
+    if domain == "" {
+        return fmt.Errorf("domain not set")
+    }
+
+    type ActivityBody struct {
+        ProjectId   int    `json:"project_id"`
+        TaskId      int    `json:"task_id"`
+        Description string `json:"description"`
+        Date        string `json:"date"`
+        Seconds     int    `json:"seconds"`
+    }
+    marshaledBody, err := json.Marshal(ActivityBody{
+        ProjectId:   projectId,
+        TaskId:      taskId,
+        Description: description,
+        Date:        time.Now().Format("2006-01-02"),
+        Seconds:     minutes * 60,
+    })
+    fmt.Println(string(marshaledBody))
+
+    req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities", domain), bytes.NewReader(marshaledBody))
+    req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+    req.Header.Add("Content-Type", "application/json")
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil || resp.StatusCode == 422 {
+        return fmt.Errorf("Error on response.\n[ERROR] - %s", err)
+    }
+    defer resp.Body.Close()
+    return nil
+}
+
+func StartActivity(projectId int, taskId int, description string) error {
 	config := config.Init()
 	apiKey := config.GetString("api_key")
 	domain := config.GetString("domain")

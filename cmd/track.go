@@ -71,10 +71,10 @@ var trackCmd = &cobra.Command{
 		}
 
 		if description == "" {
-			huh.NewInput().Title("Description:").Prompt(">").Value(&description).Run()
+			huh.NewInput().Title("Description:").Prompt("> ").Value(&description).Run()
 		}
 
-		err = data.CreateActivity(projectId, taskId, description)
+		err = data.StartActivity(projectId, taskId, description)
 		if err != nil {
 			fmt.Println("Could not create activity:", err)
 		}

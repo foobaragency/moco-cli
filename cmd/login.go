@@ -32,10 +32,10 @@ var loginCmd = &cobra.Command{
 
 		form := huh.NewForm(
             huh.NewGroup(
-                huh.NewInput().Title("Domain").Prompt("?").Value(&domain),
-                huh.NewInput().Title("First Name").Prompt("?").Value(&firstName),
-                huh.NewInput().Title("Last Name").Prompt("?").Value(&lastName),
-                huh.NewInput().Title("API Key").Prompt("?").Value(&apiKey).Password(true),
+                huh.NewInput().Title("Domain").Prompt("? ").Value(&domain),
+                huh.NewInput().Title("First Name").Prompt("? ").Value(&firstName),
+                huh.NewInput().Title("Last Name").Prompt("? ").Value(&lastName),
+                huh.NewInput().Title("API Key").Prompt("? ").Value(&apiKey).Password(true),
             ),
         )
 
