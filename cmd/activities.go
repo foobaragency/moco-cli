@@ -82,10 +82,10 @@ var createCmd = &cobra.Command{
                 minutes = 0
             } else {
                 minutes, err = strconv.Atoi(minutesStr)
-            }
-            if err != nil {
-                fmt.Println("Invalid minutes")
-                return
+                if err != nil {
+                    fmt.Println("Invalid minutes")
+                    return
+                }
             }
         }
 
