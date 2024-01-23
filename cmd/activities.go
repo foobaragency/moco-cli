@@ -3,27 +3,43 @@ package cmd
 import (
 	"fmt"
 	"moco/data"
+	"os"
 	"strconv"
 
 	"github.com/charmbracelet/huh"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
-var newCmd = &cobra.Command{
-	Use:   "new",
+var createCmd = &cobra.Command{
+	Use:   "create",
 	Short: "Create a new activity",
 	Run: func(cmd *cobra.Command, args []string) {
-		projectId, _ := cmd.Flags().GetInt("project")
-		taskId, _ := cmd.Flags().GetInt("task")
+        projects, err := data.GetProjects()
+        if err != nil {
+            fmt.Println("Could not retrieve projects", err)
+            return
+        }
+
+        // flags has highest priority
+		projectId, err := cmd.Flags().GetInt("project")
+		taskId, err := cmd.Flags().GetInt("task")
+        minutes, err := cmd.Flags().GetInt("minutes")
 		description, err := cmd.Flags().GetString("description")
 
-		projects, err := data.GetProjects()
-		if err != nil {
-			fmt.Println("Could not retrieve projects", err)
-		}
+        // env has second priority
+        err = godotenv.Load(".moco")
+        if projectId == 0 && err == nil {
+            projectId, err = strconv.Atoi(os.Getenv("MOCO_PROJECT_ID"))
+            fmt.Println("read projectId", projectId)
+        }
+        if taskId == 0 && err == nil {
+            taskId, err = strconv.Atoi(os.Getenv("MOCO_TASK_ID"))
+            fmt.Println("read taskId", taskId)
+        }
 
+        // if no flags or config, prompt
 		if projectId == 0 {
-
 			options := make([]huh.Option[int], len(projects))
 			for i, p := range projects {
 				options[i] = huh.NewOption[int](p.Name, p.Id)
@@ -55,11 +71,26 @@ var newCmd = &cobra.Command{
 			}
 		}
 
-		if description == "" {
-			huh.NewInput().Title("Description:").Prompt(">").Value(&description).Run()
-		}
+        if description == "" {
+            huh.NewInput().Title("Description:").Prompt("> ").Value(&description).Run()
+        }
 
-		err = data.CreateActivity(projectId, taskId, description)
+        if minutes == 0 {
+            var minutesStr string
+            huh.NewInput().Title("Time (minutes, entering '0' or empty will start a timer):").Prompt("> ").Value(&minutesStr).Run()
+            if minutesStr == "" {
+                minutes = 0
+            } else {
+                minutes, err = strconv.Atoi(minutesStr)
+                if err != nil {
+                    fmt.Println("Invalid minutes")
+                    return
+                }
+            }
+        }
+
+
+		err = data.CreateActivity(projectId, taskId, description, minutes)
 		if err != nil {
 			fmt.Println("Could not create activity:", err)
 		}
@@ -79,13 +110,13 @@ var editCmd = &cobra.Command{
 			fmt.Println("Invalid activity id")
 			return
 		}
-		seconds, err := cmd.Flags().GetInt("time")
+		minutes, err := cmd.Flags().GetInt("time")
 		description, err := cmd.Flags().GetString("description")
-		if err != nil || (seconds == 0 && description == "") {
+		if err != nil || (minutes == 0 && description == "") {
 			cmd.Help()
 			return
 		}
-		err = data.EditActivity(activityId, seconds, description)
+		err = data.EditActivity(activityId, minutes, description)
 		if err != nil {
 			fmt.Println("Could not edit activity:", err)
 		}
@@ -118,14 +149,16 @@ var activitiesCmd = &cobra.Command{
 }
 
 func init() {
-	editCmd.Flags().IntP("time", "t", 0, "Set the time for the activity (in seconds)")
+	editCmd.Flags().IntP("time", "t", 0, "Set the time for the activity (in minutes)")
 	editCmd.Flags().StringP("description", "d", "", "Set the description for the activity")
 
+    createCmd.Flags().IntP("project", "p", 0, "Set the project for the activity")
+    createCmd.Flags().IntP("task", "t", 0, "Set the task for the activity")
+    createCmd.Flags().StringP("description", "d", "", "Set the description for the activity")
+    createCmd.Flags().IntP("minutes", "m", 0, "Set the number of minutes for the activity")
+
 	activitiesCmd.AddCommand(editCmd)
-
-	newCmd.Flags().Bool("no-start", false, "Don't start the activity when created")
-	activitiesCmd.AddCommand(newCmd)
-
+	activitiesCmd.AddCommand(createCmd)
 	activitiesCmd.AddCommand(deleteCmd)
 
 	rootCmd.AddCommand(activitiesCmd)
