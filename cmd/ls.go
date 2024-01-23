@@ -16,8 +16,11 @@ var projectCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         projects, _ := data.GetProjects()
         t := table.New().
-            Border(lipgloss.NormalBorder()).
-            Headers("ID", "Name")
+            Border(lipgloss.RoundedBorder()).
+            Headers("ID", "Name").
+            StyleFunc(func(row, col int) lipgloss.Style {
+                return lipgloss.NewStyle().Padding(0, 1)
+            })
         for _, project := range projects {
             t.Row(fmt.Sprintf("%d", project.Id), project.GetName())
         }
@@ -32,7 +35,10 @@ var taskCmd = &cobra.Command{
         projectId, err := cmd.Flags().GetInt("project")
 
         t := table.New().
-            Border(lipgloss.NormalBorder()).
+            Border(lipgloss.RoundedBorder()).
+            StyleFunc(func(row, col int) lipgloss.Style {
+                return lipgloss.NewStyle().Padding(0, 1)
+            }).
             Headers("ID", "Name")
         if projectId != 0 && err == nil {
             project, err := data.GetProject(projectId)
@@ -84,17 +90,18 @@ var activityCmd = &cobra.Command{
             }
         }
         t := table.New().
-            Border(lipgloss.NormalBorder()).
+            Border(lipgloss.RoundedBorder()).
             Headers("ID", "Date", "Time", "Description").
             StyleFunc(func(row int, col int) lipgloss.Style {
+                style := lipgloss.NewStyle().Padding(0, 1)
                 if (runningIndex < 1) {
-                    return lipgloss.Style{}
+                    return style
                 }
 
                 if runningIndex == row {
-                    return lipgloss.NewStyle().Foreground(lipgloss.Color("9")).Bold(true)
+                    return style.Foreground(lipgloss.Color("9")).Bold(true)
                 }
-                return lipgloss.Style{}
+                return style
             }).
             Rows(rows...)
         fmt.Println(t)
