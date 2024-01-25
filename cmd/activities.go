@@ -95,6 +95,32 @@ var createCmd = &cobra.Command{
 	},
 }
 
+var restartCmd = &cobra.Command{
+    Use:   "restart",
+    Short: "Restart an activity (empty <activity> will restart last activity)",
+    Run: func(cmd *cobra.Command, args []string) {
+        activityId, err := cmd.Flags().GetInt("activity")
+
+        if activityId == 0 || err != nil {
+            activities, err := data.GetActivities()
+            if err != nil {
+                fmt.Println("Could not retrieve activities", err)
+                return
+            }
+            if len(activities) == 0 {
+                fmt.Println("No activities found")
+                return
+            }
+            activityId = activities[len(activities)-1].Id
+        }
+
+        err = data.RestartActivity(activityId)
+        if err != nil {
+            fmt.Println("Could not restart activity:", err)
+        }
+    },
+}
+
 var editCmd = &cobra.Command{
 	Use:   "edit <activity>",
 	Short: "Edit an activity",
@@ -158,6 +184,7 @@ func init() {
 	activitiesCmd.AddCommand(editCmd)
 	activitiesCmd.AddCommand(createCmd)
 	activitiesCmd.AddCommand(deleteCmd)
+    activitiesCmd.AddCommand(restartCmd)
 
 	rootCmd.AddCommand(activitiesCmd)
 }

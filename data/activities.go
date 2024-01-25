@@ -134,6 +134,30 @@ func StartActivity(projectId int, taskId int, description string) error {
 	return nil
 }
 
+func RestartActivity(id int) error {
+    config := config.Init()
+    apiKey := config.GetString("api_key")
+    domain := config.GetString("domain")
+    if apiKey == "" {
+        return fmt.Errorf("api_key not set")
+    }
+    if domain == "" {
+        return fmt.Errorf("domain not set")
+    }
+
+    req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d/start_timer", domain, id), nil)
+    req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
+    req.Header.Add("Content-Type", "application/json")
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil || resp.StatusCode == 422 {
+        return err
+    }
+    defer resp.Body.Close()
+    return nil
+}
+
 func EditActivity(id int, minutes int, description string) error {
 	config := config.Init()
 	apiKey := config.GetString("api_key")
