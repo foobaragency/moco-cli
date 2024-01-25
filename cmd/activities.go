@@ -35,6 +35,9 @@ var createCmd = &cobra.Command{
         if taskId == 0 && err == nil {
             taskId, err = strconv.Atoi(os.Getenv("MOCO_TASK_ID"))
         }
+        if description == "" && err == nil {
+            description = os.Getenv("MOCO_DESCRIPTION")
+        }
 
         // if no flags or config, prompt
 		if projectId == 0 {
