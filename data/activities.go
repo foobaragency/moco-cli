@@ -145,8 +145,6 @@ func RestartActivity(id int) error {
         return fmt.Errorf("domain not set")
     }
 
-    fmt.Printf("https://%s.mocoapp.com/api/v1/activities/%d/start_timer", domain, id)
-
     req, _ := http.NewRequest("PATCH", fmt.Sprintf("https://%s.mocoapp.com/api/v1/activities/%d/start_timer", domain, id), nil)
     req.Header.Add("Authorization", fmt.Sprintf("Token token=%s", apiKey))
     req.Header.Add("Content-Type", "application/json")
