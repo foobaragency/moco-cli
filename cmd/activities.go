@@ -181,6 +181,8 @@ func init() {
     createCmd.Flags().StringP("description", "d", "", "Set the description for the activity")
     createCmd.Flags().IntP("minutes", "m", 0, "Set the number of minutes for the activity")
 
+    restartCmd.Flags().IntP("activity", "a", 0, "Set the activity to restart")
+
 	activitiesCmd.AddCommand(editCmd)
 	activitiesCmd.AddCommand(createCmd)
 	activitiesCmd.AddCommand(deleteCmd)
