@@ -21,6 +21,8 @@ var createCmd = &cobra.Command{
             return
         }
 
+        forceSelect, _ := cmd.Flags().GetBool("select")
+
         // flags has highest priority
 		projectId, err := cmd.Flags().GetInt("project")
 		taskId, err := cmd.Flags().GetInt("task")
@@ -40,7 +42,7 @@ var createCmd = &cobra.Command{
         }
 
         // if no flags or config, prompt
-		if projectId == 0 {
+		if projectId == 0 || forceSelect {
 			options := make([]huh.Option[int], len(projects))
 			for i, p := range projects {
 				options[i] = huh.NewOption[int](p.Name, p.Id)
@@ -60,7 +62,7 @@ var createCmd = &cobra.Command{
 			}
 		}
 
-		if taskId == 0 {
+		if taskId == 0 || forceSelect {
 			options := make([]huh.Option[int], len(project.Tasks))
 			for i, t := range project.Tasks {
 				options[i] = huh.NewOption[int](t.Name, t.Id)
@@ -72,7 +74,7 @@ var createCmd = &cobra.Command{
 			}
 		}
 
-        if description == "" {
+        if description == "" || forceSelect {
             huh.NewInput().Title("Description:").Prompt("> ").Value(&description).Run()
         }
 
@@ -183,6 +185,7 @@ func init() {
     createCmd.Flags().IntP("task", "t", 0, "Set the task for the activity")
     createCmd.Flags().StringP("description", "d", "", "Set the description for the activity")
     createCmd.Flags().IntP("minutes", "m", 0, "Set the number of minutes for the activity")
+    createCmd.Flags().BoolP("select", "s", false, "Force selection of project and task from list")
 
     restartCmd.Flags().IntP("activity", "a", 0, "Set the activity to restart")
 
