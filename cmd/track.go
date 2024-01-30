@@ -30,7 +30,6 @@ var trackCmd = &cobra.Command{
         err = godotenv.Load(".moco")
         if projectId == 0 && err == nil {
             projectId, err = strconv.Atoi(os.Getenv("MOCO_PROJECT_ID"))
-            fmt.Printf("read %s\n", os.Getenv("MOCO_PROJECT_ID"))
         }
         if taskId == 0 && err == nil {
             taskId, err = strconv.Atoi(os.Getenv("MOCO_TASK_ID"))
